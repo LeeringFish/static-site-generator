@@ -1,8 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
-from htmlnode import LeafNode
-from htmlnode import ParentNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
     def test_all_none(self):
@@ -57,4 +55,7 @@ class TestHTMLNode(unittest.TestCase):
             node.to_html(),
             "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",
         )
-    
+
+
+if __name__ == "__main__":
+    unittest.main()

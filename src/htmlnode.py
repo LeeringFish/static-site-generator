@@ -46,10 +46,12 @@ class ParentNode(HTMLNode):
         if self.children is None:
             raise ValueError("parent node must have children")
         
-        html_string = ""
+        children_string = ""
 
         for child in self.children:
-            html_string += child.to_html()
+            children_string += child.to_html()
 
-        return f'<{self.tag}{self.props_to_html()}>{html_string}</{self.tag}>'
+        return f'<{self.tag}{self.props_to_html()}>{children_string}</{self.tag}>'
+    
+
         

@@ -51,11 +51,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     for node in old_nodes:
         if node.text_type == TextType.TEXT:
             parts = node.text.split(delimiter)
-            if len(parts) < 3:
+            split_nodes = []
+            if len(parts) % 2 == 0:
                 raise Exception("invalid markdown syntax")
-            new_nodes.extend([TextNode(parts[0], TextType.TEXT),
-                              TextNode(parts[1], text_type),
-                              TextNode(parts[2], TextType.TEXT),])
+            for i in range(len(parts)):
+                part = parts[i]
+                if part != "":
+                    if i % 2 == 0:
+                        split_nodes.append(TextNode(part, TextType.TEXT))
+                    else:
+                        split_nodes.append(TextNode(part, text_type))
+
+            new_nodes.extend(split_nodes)
+
         else:
             new_nodes.append(node)
     

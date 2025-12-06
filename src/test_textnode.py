@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType 
-from textnode import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images
+from textnode import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -92,6 +92,44 @@ class TestTextNode(unittest.TestCase):
         )
         self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
 
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com)"
+        )
+        self.assertListEqual([("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com")], matches)
+
+    def test_multiple_links(self):
+        text = "Links: [first](https://a.com) and [second](https://b.com)"
+        matches = extract_markdown_links(text)
+        self.assertListEqual(
+            [("first", "https://a.com"), ("second", "https://b.com")],
+            matches,
+    )
+        
+    def test_multiple_images(self):
+        text = "Pics: ![one](https://a.com/1.png) and ![two](https://a.com/2.png)"
+        matches = extract_markdown_images(text)
+        self.assertListEqual(
+            [("one", "https://a.com/1.png"), ("two", "https://a.com/2.png")],
+            matches,
+    )
+        
+    def test_link_does_not_match_image(self):
+        text = "![img](https://i.com/x.png) and [site](https://example.com)"
+        matches = extract_markdown_links(text)
+        self.assertListEqual(
+            [("site", "https://example.com")],
+            matches,
+    )
+        
+    def test_brackets_in_text(self):
+        text = "Weird [text [inside]](https://example.com)"
+        matches = extract_markdown_links(text)
+        self.assertListEqual(
+            [("text [inside]", "https://example.com")],
+            matches,
+    )
+        
 
 
 

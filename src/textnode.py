@@ -87,15 +87,41 @@ def split_nodes_image(old_nodes):
                 new_nodes.append(node)
                 continue
 
-            for image in images:
-                image_alt = image[0]
-                image_link = image[1]
+            for image_alt, image_link in images:
                 sections = current.split(f"![{image_alt}]({image_link})", 1)
                 before = sections[0]
                 after = sections[1]
                 if before:
                     new_nodes.append(TextNode(before, TextType.TEXT))
                 new_nodes.append(TextNode(image_alt, TextType.IMAGE, image_link))
+                current = after
+
+            if current:
+                new_nodes.append(TextNode(current, TextType.TEXT))    
+            
+        else:
+            new_nodes.append(node)
+
+    return new_nodes
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type == TextType.TEXT:
+            current = node.text
+            links = extract_markdown_links(current)
+            if len(links) == 0:
+                new_nodes.append(node)
+                continue
+
+            for anchor_text, url in links:
+                sections = current.split(f"[{anchor_text}]({url})", 1)
+                before = sections[0]
+                after = sections[1]
+                if before:
+                    new_nodes.append(TextNode(before, TextType.TEXT))
+                new_nodes.append(TextNode(anchor_text, TextType.LINK, url))
                 current = after
 
             if current:

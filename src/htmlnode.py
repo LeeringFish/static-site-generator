@@ -1,3 +1,7 @@
+from block_markdown import BlockType, block_to_block_type, markdown_to_blocks
+from inline_markdown import strip_delimiters, text_to_textnodes
+from textnode import TextNode, TextType, text_node_to_html_node
+
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -54,4 +58,57 @@ class ParentNode(HTMLNode):
         return f'<{self.tag}{self.props_to_html()}>{children_string}</{self.tag}>'
     
 
-        
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    block_nodes = []
+
+    for block in blocks:
+        type = block_to_block_type(block)
+        if type == BlockType.CODE:
+            text = strip_delimiters(block, "```")
+            code_node = text_node_to_html_node(TextNode(text, TextType.CODE))
+            pre_node = HTMLNode(tag="pre", children=[code_node])
+            block_nodes.append(pre_node)
+        else:
+            if type == BlockType.PARAGRAPH:
+                children = text_to_children(block)
+                block_nodes.append(HTMLNode(tag="p", children=children))
+            elif type == BlockType.HEADING:
+                level = get_heading_level(block)
+                tag = "h" + str(level)
+                text = block[level:].lstrip()
+                children = text_to_children(text)
+                block_nodes.append(HTMLNode(tag=tag, children=children))
+            elif type == BlockType.QUOTE:
+                children = text_to_children(clean_quote_block(block))
+                block_nodes.append(HTMLNode(tag="blockquote", children=children))
+
+    
+    return HTMLNode(tag="div", children=block_nodes)
+
+
+def get_heading_level(text):
+    count = 0
+
+    for ch in text:
+        if ch == "#":
+            count += 1
+        else:
+            break
+
+    return count
+
+def clean_quote_block(block):
+    lines = block.split("\n")
+    cleaned = []
+    for line in lines:
+        line = line.lstrip(">")
+        line = line.lstrip()
+        cleaned.append(line)
+
+    return "\n".join(cleaned)
+
+
+def text_to_children(text):
+    nodes = text_to_textnodes(text)
+    return [text_node_to_html_node(node) for node in nodes]

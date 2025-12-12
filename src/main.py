@@ -1,9 +1,31 @@
+import os
+import shutil
+
 from textnode import TextNode
 from textnode import TextType
 
 def main():
-    node = TextNode("Some text", TextType.TEXT)
-    print(node)
+    copy_from_source_to_destination("static", "public")
+
+def copy_from_source_to_destination(source, destination):
+    if os.path.exists(destination):
+        shutil.rmtree(destination)
+
+    os.mkdir(destination)
+
+    source_items = os.listdir(source)
+    for item in source_items:
+        source_item_path = os.path.join(source, item)
+        destination_item_path = os.path.join(destination, item)
+
+        if os.path.isfile(source_item_path):
+            shutil.copy(source_item_path, destination_item_path)
+            print(f"Copying file: {source_item_path} -> {destination_item_path}")
+        else:
+            os.mkdir(destination_item_path)
+            copy_from_source_to_destination(source_item_path, destination_item_path)
+
+
 
 
 if __name__ == "__main__":

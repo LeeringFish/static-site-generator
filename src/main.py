@@ -1,6 +1,6 @@
 import os
 from copystatic import copy_from_source_to_destination
-from gencontent import generate_page
+from gencontent import generate_page, generate_pages_recursive
 
 dir_path_static = "./static"
 dir_path_public = "./public"
@@ -10,10 +10,11 @@ template_path = "./template.html"
 def main():
     copy_from_source_to_destination(dir_path_static, dir_path_public)
 
-    generate_page(
-        os.path.join(dir_path_content, "index.md"),
+    generate_pages_recursive(
+        dir_path_content,
         template_path,
-        os.path.join(dir_path_public, "index.html"),
+        dir_path_public,
+        dir_path_content,
     )
 
 
